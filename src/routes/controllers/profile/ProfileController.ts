@@ -62,7 +62,9 @@ export class ProfileController implements Controller {
     const employeesUID = employees.map((employee) => employee.id);
 
     if (employeesUID.includes(updateUserUID)) {
-      this.usersService.updateByUID(updateUserUID, newBossUID);
+      this.usersService.updateByUID(updateUserUID, {
+        bossId: newBossUID,
+      });
       res.status(200).json({
         message: 'User was updated succesfully',
       });

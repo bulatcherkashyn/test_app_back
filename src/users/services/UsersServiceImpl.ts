@@ -37,9 +37,9 @@ export class UsersServiceImpl implements UsersService {
     return employees;
   }
 
-  public async updateByUID(uid: string, newBossUID: string): Promise<void> {
+  public async updateByUID(uid: string, updateData: User): Promise<void> {
     logger.debug(`user.service.update-employee-by-uid.start.for-uid: [${uid}]`);
-    await this.dao.updateByUID(uid, newBossUID);
+    await this.dao.updateByUID(uid, updateData);
     logger.debug(`user.service.find-employees-by-uid.start.for-uid: [${uid}]`);
   }
 }

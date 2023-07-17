@@ -8,5 +8,5 @@ export interface UsersDAO {
   findByUID(UID: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   getEmployees(email: string): Promise<Array<UserResponse>>;
-  updateByUID(uid: string, newBossUID: string): Promise<void>;
+  updateByUID(uid: string, updateData: Partial<User>): Promise<void>;
 }

@@ -3,7 +3,7 @@ import { AuthService } from '@app/auth/AuthService';
 import { ApplicationError } from '@app/error/ApplicationError';
 import { logger } from '@app/logger/LoggerFactory';
 import { CreateUserDTO } from '@app/users/dto/UsersDTO';
-import { User } from '@app/users/models/User';
+import { User, UserRoles } from '@app/users/models/User';
 import { UsersService } from '@app/users/services/UsersService';
 import { createHash } from 'crypto';
 import { inject, injectable } from 'tsyringe';
@@ -24,8 +24,30 @@ export class AuthServiceImpl implements AuthService {
   public async registerUser(user: CreateUserDTO): Promise<void> {
     logger.debug('auth.service.register.start.for:', user.username);
     const hashedPassword = AuthServiceImpl.encryptPassword(user.password);
+    const isUserExists = !!(await this.userService.findByEmail(user.username));
 
-    await this.userService.createUser({ ...user, password: hashedPassword });
+    if (isUserExists) {
+      throw new ApplicationError('User with such username is already registered', 400);
+    }
+
+    if (user.role !== UserRoles.ADMIN) {
+      if (!user.bossId) {
+        throw new ApplicationError('missed bossId parameter', 400);
+      }
+      const patron = await this.userService.findByUID(user.bossId);
+
+      if (!patron) {
+        throw new ApplicationError('User with such bossId parameter does not exists', 400);
+      }
+      await this.userService.createUser({ ...user, password: hashedPassword });
+      if (patron.role === UserRoles.REGULAR) {
+        await this.userService.updateByUID(user.bossId, {
+          role: UserRoles.BOSS,
+        });
+      }
+    } else {
+      await this.userService.createUser({ ...user, password: hashedPassword });
+    }
     logger.debug('auth.service.register.start.for:', user.username);
   }
 

@@ -7,5 +7,5 @@ export interface UsersService {
   findByUID(uid: string): Promise<User | null>;
   findByEmail(email: string): Promise<User | null>;
   getEmployees(id: string): Promise<Array<UserResponse>>;
-  updateByUID(uid: string, newBossUID: string): Promise<void>;
+  updateByUID(uid: string, updateData: User): Promise<void>;
 }
