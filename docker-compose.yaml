@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  test_db_service:
+    image: postgres:11.5-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DB: "${POSTGRES_DB}"
+    networks:
+      - default
+
+  test_backend:
+    build: ./
+    ports:
+      - '3000:3000'
+    command: yarn start
+    environment:
+      DATABASE_URL: "postgresql://dbuser:superpassword@test_db_service:5432/testdb?schema=public"
+    depends_on:
+      - test_db_service

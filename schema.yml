@@ -1,0 +1,186 @@
+openapi: 3.0.3
+info:
+  title: PomodoroApp API
+  description:  Application to help orginize your work time.
+  version: 0.1.0
+
+servers:
+  - url: http://localhost:3000
+    description: Optional server description, Dev server
+
+paths:
+  /profile:
+    get:
+      tags:
+        - profile
+      summary: get profile info
+      description: get profile info
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: response profile info
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/NestedProfileResponse'
+                  - $ref: '#/components/schemas/SingleProfile'
+
+  /profile/{updateUserUID}:
+    put:
+      tags:
+        - profile
+      summary: changing of specified user boss
+      description: changing of specified user boss via userUID and bossUID
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: updateUserUID
+          description: UID of updated user
+          schema:
+            type: string
+            format: uuid
+            example: 00000000-0000-0000-0000-000000000000
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/UpdateProfile'
+
+      responses:
+        '200':
+          description: A JSON array of user names
+          content:
+            application/json:
+              schema: 
+                type: object
+                items: 
+                  type: string
+
+  /auth/signin:
+    post:
+      tags:
+        - auth
+      summary: login
+      description: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/LoginForm'
+      responses:
+        '200':
+          description: Succesfull login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyVUlEIjoiZTQyMWJmNDEtMmNiZi00Y2M4LWE1NTQtNTdkYzI5N2VjZDVhIiwiaWF0IjoxNjg5NTk3Mjk0LCJleHAiOjE2ODk1OTc1OTR9.4NSsD6NmGgpcwR5sgQ1o3w37czZlpMhr1Ppnnmgvi2c
+  
+  /auth/signup:
+    post:
+      tags:
+        - auth
+      summary: register user
+      description: register users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/LoginForm'
+      responses:
+        '200':
+          description: Succesfull login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user registered succesfully
+                    
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+  schemas:
+    UserRole:
+      type: string
+      enum: [ADMIN, BOSS, REGULAR]
+      description: >
+        Sort order:
+         * `ADMIN` - top level user
+         * `BOSS` - has at least one subordinate
+         * `REGULAR` - ordinary employee
+      
+    GetProfile:
+      type: object
+      properties:
+        token:
+          type: string
+    UpdateProfile:
+      type: object
+      properties:
+        newBossUID:
+          type: string
+          format: uuid
+    SingleProfile:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          format: email
+        bossId:
+          type: string
+          format: uuid
+        role:
+          $ref: '#/components/schemas/UserRole'
+    NestedProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          format: email
+        bossId:
+          type: string
+          format: uuid
+        role:
+          $ref: '#/components/schemas/UserRole'
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/SingleProfile'
+    RegisterForm:
+      type: object
+      properties:
+        username:
+          type: string
+          format: email
+        role:
+          $ref: '#/components/schemas/UserRole'
+    LoginForm:
+      type: object
+      properties:
+        username:
+          type: string
+          format: email
+        password:
+          type: string
