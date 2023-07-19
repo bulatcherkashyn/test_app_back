@@ -61,7 +61,10 @@ export class ProfileController implements Controller {
     const employees = await this.usersService.getEmployees(updateUserInfo.currentUserUID);
     const employeesUID = employees.map((employee) => employee.id);
 
-    if (employeesUID.includes(updateUserInfo.updateUserUID)) {
+    if (
+      employeesUID.includes(updateUserInfo.updateUserUID) &&
+      employeesUID.includes(updateUserInfo.newBossUID)
+    ) {
       await this.usersService.updateByUID(updateUserInfo.updateUserUID, {
         bossId: updateUserInfo.newBossUID,
       });
