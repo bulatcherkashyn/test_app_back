@@ -3,10 +3,11 @@ import 'reflect-metadata';
 import { verifyAccess } from '@app/common/acs/ACSMiddleware';
 import { availableOperations } from '@app/common/acs/permissions';
 import { validate } from '@app/common/validator/ValidationMiddleware';
+import { ApplicationError } from '@app/error/ApplicationError';
 import { logger } from '@app/logger/LoggerFactory';
 import { Controller } from '@app/routes/controllers/Controller';
 import { CreateUserDTO } from '@app/users/dto/UsersDTO';
-import { UserRoles, VerifiedUser } from '@app/users/models/User';
+import { UserRoles } from '@app/users/models/User';
 import { UsersService } from '@app/users/services/UsersService';
 import { GetUserValidator } from '@app/users/validator/GetUserValidator';
 import { UpdateUserValidator } from '@app/users/validator/UpdateUserValidator';
@@ -55,38 +56,38 @@ export class ProfileController implements Controller {
 
   public updateProfile = async (req: Request, res: Response): Promise<void> => {
     logger.debug('profile.controller.update-profile.start');
-    const newBossUID = req.body.newBossUID as string;
-    const updateUserUID = req.params.updateUserUID as string;
-    const { id: currentUserUID } = req.user as VerifiedUser;
-    const employees = await this.usersService.getEmployees(currentUserUID);
+    const updateUserInfo = this.updateUserModelConstructor.constructPureObject(req);
+
+    const employees = await this.usersService.getEmployees(updateUserInfo.currentUserUID);
     const employeesUID = employees.map((employee) => employee.id);
 
-    if (employeesUID.includes(updateUserUID)) {
-      this.usersService.updateByUID(updateUserUID, {
-        bossId: newBossUID,
+    if (employeesUID.includes(updateUserInfo.updateUserUID)) {
+      await this.usersService.updateByUID(updateUserInfo.updateUserUID, {
+        bossId: updateUserInfo.newBossUID,
       });
       res.status(200).json({
         message: 'User was updated succesfully',
       });
+    } else {
+      throw new ApplicationError('Wrong update parameters', 400);
     }
 
     logger.debug('profile.controller.update-profile.end');
   };
 
   public getProfile = async (req: Request, res: Response): Promise<void> => {
-    const { id, role } = req.user as VerifiedUser;
-    const { password, ...refinedUser } = req.user as VerifiedUser;
+    const getUserParams = this.getUserModelConstructor.constructPureObject(req);
 
-    if (role === UserRoles.REGULAR) {
+    if (getUserParams.role === UserRoles.REGULAR) {
       res.status(200).json({
-        ...refinedUser,
+        ...getUserParams,
       });
       return;
     }
 
-    const employees = await this.usersService.getEmployees(id);
+    const employees = await this.usersService.getEmployees(getUserParams.id);
     const result = {
-      ...refinedUser,
+      ...getUserParams,
       employees,
     };
 
