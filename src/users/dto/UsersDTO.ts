@@ -1,5 +1,5 @@
 import { User } from '../models/User';
-export type CreateUserDTO = Required<Omit<User, 'id'>>;
+export type CreateUserDTO = Required<Omit<User, 'id' | 'bossId'>> & Partial<Pick<User, 'bossId'>>;
 
 export interface UpdateUserDTO {
   updateUserUID: string;
