@@ -1,12 +1,12 @@
 openapi: 3.0.3
 info:
-  title: PomodoroApp API
-  description:  Application to help orginize your work time.
+  title: test app backend
+  description:  test app backend
   version: 0.1.0
 
 servers:
   - url: http://localhost:3000
-    description: Optional server description, Dev server
+    description: default API url
 
 paths:
   /profile:
