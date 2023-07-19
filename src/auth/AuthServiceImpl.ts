@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { AuthProvider } from '@app/auth/AuthProvider';
 import { AuthService } from '@app/auth/AuthService';
 import { ApplicationError } from '@app/error/ApplicationError';
@@ -24,12 +25,12 @@ export class AuthServiceImpl implements AuthService {
   public async registerUser(user: CreateUserDTO): Promise<void> {
     logger.debug('auth.service.register.start.for:', user.username);
     const hashedPassword = AuthServiceImpl.encryptPassword(user.password);
-    const isUserExists = !!(await this.userService.findByEmail(user.username));
+    // const isUserExists = !!(await this.userService.findByEmail(user.username));
 
-    if (isUserExists) {
-      throw new ApplicationError('User with such username is already registered', 400);
-    }
-
+    // if (isUserExists) {
+    //   throw new ApplicationError('User with such username is already registered', 400);
+    // }
+    console.log('AAAAAAA');
     if (user.role !== UserRoles.ADMIN) {
       if (!user.bossId) {
         throw new ApplicationError('missed bossId parameter', 400);
