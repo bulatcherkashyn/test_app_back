@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "yarn build:live",
+    "start:migrate": "prisma migrate dev && npm start",
+    "start": "npm run build:live",
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint --fix \"./src/**/*.ts\"",
     "build": "tsc -p tsconfig.json",
