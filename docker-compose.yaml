@@ -16,7 +16,7 @@ services:
     build: ./
     ports:
       - '3000:3000'
-    command: npm run start:migrate
+    command: npm run start:migrate:seed
     environment:
       DATABASE_URL: "postgresql://dbuser:superpassword@test_db_service:5432/testdb?schema=public"
     depends_on:

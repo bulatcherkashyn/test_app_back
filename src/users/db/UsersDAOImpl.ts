@@ -63,7 +63,6 @@ export class UsersDAOImpl implements UsersDAO {
 
   public async updateByUID(trx: TrxClient, uid: string, updateData: Partial<User>): Promise<void> {
     logger.debug('user.dao.update-by-uid-start');
-    // try {
     await trx.user.update({
       where: {
         id: uid,
@@ -73,17 +72,6 @@ export class UsersDAOImpl implements UsersDAO {
       },
     });
     logger.debug('user.dao.update-by-uid-end');
-    // } catch (e) {
-    //   if (e instanceof Prisma.PrismaClientKnownRequestError) {
-    //     if (e.code === 'P2002') {
-    //       throw new ApplicationError(
-    //         'There is a unique constraint violation, a new user cannot be created with this email',
-    //         400,
-    //       );
-    //     }
-    //   }
-    //   throw e;
-    // }
   }
 
   public async createUser(trx: TrxClient, user: CreateUserDTO): Promise<void> {
